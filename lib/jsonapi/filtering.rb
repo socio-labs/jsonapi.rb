@@ -1,5 +1,5 @@
 require 'ransack/predicate'
-require_relative 'patches'
+require_relative 'patches' if defined?(::ActiveRecord)
 
 # Filtering and sorting support
 module JSONAPI
