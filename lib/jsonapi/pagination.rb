@@ -80,13 +80,14 @@ module JSONAPI
       last_page = [1, (total.to_f / limit).ceil].max
 
       numbers[:first] = 1
+      numbers[:last] = last_page
+
       if page > 1
         numbers[:prev] = page - 1
       end
 
       if page < last_page
         numbers[:next] = page + 1
-        numbers[:last] = last_page
       end
 
       if total.present?
