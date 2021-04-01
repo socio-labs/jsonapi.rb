@@ -30,7 +30,7 @@ module JSONAPI
     #
     # @return [Array]
     def jsonapi_pagination(resources)
-      links = { self: nil }
+      links = {}
 
       pagination = jsonapi_pagination_builder(resources)
 
