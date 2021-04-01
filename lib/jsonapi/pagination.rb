@@ -30,7 +30,9 @@ module JSONAPI
     #
     # @return [Array]
     def jsonapi_pagination(resources)
-      links = { self: request.base_url + request.fullpath }
+      #      links = { self: request.base_url + request.fullpath }
+      links = { self: '' }
+
       pagination = jsonapi_pagination_meta(resources)
 
       return links if pagination.blank?
@@ -40,7 +42,8 @@ module JSONAPI
       ).as_json.with_indifferent_access
 
       original_params[:page] = original_params[:page].dup || {}
-      original_url = request.base_url + request.path + '?'
+      # original_url = request.base_url + request.path + '?'
+      original_url = '?'
 
       pagination.each do |page_name, number|
         next if page_name == :records
@@ -62,7 +65,13 @@ module JSONAPI
 
       _, limit, page = jsonapi_pagination_params
 
-      numbers = { current: page }
+      numbers = {
+        current: page,
+        first: nil,
+        prev: nil,
+        next: nil,
+        last: nil
+      }
 
       if resources.respond_to?(:unscope)
         total = resources.unscope(:limit, :offset, :order).size
