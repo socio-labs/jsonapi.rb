@@ -49,9 +49,7 @@ module JSONAPI
         next if [:total_count, :total_page].include?(page_name)
 
         original_params[:page][:number] = number
-        links[page_name] = original_url + CGI.unescape(
-          original_params.to_query
-        )
+        links[page_name] = number.nil? ? nil : (original_url + CGI.unescape(original_params.to_query))
       end
 
       links
