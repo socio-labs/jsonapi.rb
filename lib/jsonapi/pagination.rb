@@ -3,7 +3,7 @@ module JSONAPI
   module Pagination
     private
     # Default number of items per page.
-    JSONAPI_PAGE_SIZE = 30
+    JSONAPI_PAGE_SIZE = ENV.fetch('PAGINATION_LIMIT') { 30 }
 
     # Applies pagination to a set of resources
     #
@@ -33,7 +33,7 @@ module JSONAPI
       #      links = { self: request.base_url + request.fullpath }
       links = { self: '' }
 
-      pagination = jsonapi_pagination_meta(resources)
+      pagination = jsonapi_pagination_builder(resources)
 
       return links if pagination.blank?
 
@@ -46,7 +46,7 @@ module JSONAPI
       original_url = '?'
 
       pagination.each do |page_name, number|
-        next if page_name == :records
+        next if [:total_count, :total_page].include?(page_name)
 
         original_params[:page][:number] = number
         links[page_name] = original_url + CGI.unescape(
@@ -60,7 +60,7 @@ module JSONAPI
     # Generates pagination numbers
     #
     # @return [Hash] with the first, previous, next, current, last page numbers
-    def jsonapi_pagination_meta(resources)
+    def jsonapi_pagination_builder(resources)
       return {} unless JSONAPI::Rails.is_collection?(resources)
 
       _, limit, page = jsonapi_pagination_params
@@ -94,10 +94,16 @@ module JSONAPI
       end
 
       if total.present?
-        numbers[:records] = total
+        numbers[:total_count] = total
+        numbers[:total_page] = last_page
       end
 
       numbers
+    end
+
+    def jsonapi_pagination_meta(resources)
+      pagination = jsonapi_pagination_builder(resources)
+      pagination.slice(:total_count, :total_page)
     end
 
     # Extracts the pagination params
