@@ -30,8 +30,7 @@ module JSONAPI
     #
     # @return [Array]
     def jsonapi_pagination(resources)
-      #      links = { self: request.base_url + request.fullpath }
-      links = { self: '' }
+      links = { self: nil }
 
       pagination = jsonapi_pagination_builder(resources)
 
@@ -42,7 +41,6 @@ module JSONAPI
       ).as_json.with_indifferent_access
 
       original_params[:page] = original_params[:page].dup || {}
-      # original_url = request.base_url + request.path + '?'
       original_url = '?'
 
       pagination.each do |page_name, number|
