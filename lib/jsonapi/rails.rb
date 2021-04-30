@@ -56,7 +56,9 @@ module JSONAPI
         errors = []
         model = resource.instance_variable_get('@base')
 
-        if respond_to?(:jsonapi_serializer_class, true)
+        if options[:serializer_class]
+          model_serializer = options[:serializer_class]
+        elsif respond_to?(:jsonapi_serializer_class, true)
           model_serializer = jsonapi_serializer_class(model, false)
         else
           model_serializer = JSONAPI::Rails.serializer_class(model, false)
@@ -114,7 +116,9 @@ module JSONAPI
           options[opt] ||= send(method_name) if respond_to?(method_name, true)
         end
 
-        if respond_to?(:jsonapi_serializer_class, true)
+        if options[:serializer_class]
+          serializer_class = options[:serializer_class]
+        elsif respond_to?(:jsonapi_serializer_class, true)
           serializer_class = jsonapi_serializer_class(resource, many)
         else
           serializer_class = JSONAPI::Rails.serializer_class(resource, many)
@@ -143,7 +147,9 @@ module JSONAPI
           options[opt] ||= send(method_name) if respond_to?(method_name, true)
         end
 
-        if respond_to?(:jsonapi_serializer_class, true)
+        if options[:serializer_class]
+          serializer_class = options[:serializer_class]
+        elsif respond_to?(:jsonapi_serializer_class, true)
           serializer_class = jsonapi_serializer_class(resource, many)
         else
           serializer_class = JSONAPI::Rails.serializer_class(resource, many)

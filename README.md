@@ -103,10 +103,20 @@ Please follow the
 [JSON:API Serializer guide](https://github.com/jsonapi-serializer/jsonapi-serializer#serializer-definition)
 on how to define a serializer.
 
-To provide a different naming scheme implement the `jsonapi_serializer_class`
+To provide a different naming scheme use `serializer_class` parameter or implement the `jsonapi_serializer_class`
 method in your resource or application controller.
 
-Here's an example:
+Here's an example for `serializer_class` parameter:
+```ruby
+class CustomNamingController < ActionController::Base
+   def index
+      render jsonapi: Model.all,
+             serializer_class: MySerializer
+   end
+end
+```
+
+Here's an example for `jsonapi_serializer_class` method:
 ```ruby
 class CustomNamingController < ActionController::Base
 
@@ -287,7 +297,7 @@ class MyController < ActionController::Base
 
   def index
     jsonapi_paginate(Model.all) do |paginated|
-      render jsonapi: paginated
+      render jsonapi_paginate: paginated
     end
   end
 

@@ -62,6 +62,12 @@ class UserSerializer
   end
 end
 
+class MyUserSerializer < UserSerializer
+  attribute :full_name do |object, _|
+    "#{object.first_name} #{object.last_name}"
+  end
+end
+
 class Dummy < Rails::Application
   secrets.secret_key_base = '_'
   config.hosts << 'www.example.com' if config.respond_to?(:hosts)
@@ -91,14 +97,15 @@ class UsersController < ActionController::Base
       result = filtered.result
 
       if params[:sort].to_s.include?('notes_quantity')
-        render jsonapi: result.group('id').to_a
+        render jsonapi_paginate: result.group('id').to_a
         return
       end
 
       result = result.to_a if params[:as_list]
 
       jsonapi_paginate(result) do |paginated|
-        render jsonapi: paginated
+        render jsonapi_paginate: paginated,
+               serializer_class: MyUserSerializer
       end
     end
   end
