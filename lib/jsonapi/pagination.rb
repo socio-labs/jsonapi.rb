@@ -4,6 +4,8 @@ module JSONAPI
     private
     # Default number of items per page.
     JSONAPI_PAGE_SIZE = ENV.fetch('PAGINATION_LIMIT') { 30 }
+    # Default number of items per page.
+    PAGINATION_IGNORE_KEYS = %i[total_count total_page]
 
     # Applies pagination to a set of resources
     #
@@ -24,7 +26,10 @@ module JSONAPI
       end
 
       if options[:total_count]
-        resources.instance_variable_set(:@_predefined_total_count, options[:total_count])
+        resources.instance_variable_set(
+          :@_predefined_total_count,
+          options[:total_count]
+        )
       end
 
       block_given? ? yield(resources) : resources
@@ -48,10 +53,12 @@ module JSONAPI
       original_url = '?'
 
       pagination.each do |page_name, number|
-        next if [:total_count, :total_page].include?(page_name)
+        next if PAGINATION_IGNORE_KEYS.include?(page_name)
 
         original_params[:page][:number] = number
-        links[page_name] = number.nil? ? nil : (original_url + CGI.unescape(original_params.to_query))
+        links[page_name] = number.nil? ? nil : (
+          original_url + CGI.unescape(original_params.to_query)
+        )
       end
 
       links

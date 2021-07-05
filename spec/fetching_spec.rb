@@ -45,8 +45,8 @@ RSpec.describe UsersController, type: :request do
 
           response_json['data'].each do |item|
             user = users.detect { |u| u.id == item['id'].to_i }
-            expect(item).to have_attribute('full_name')
-                              .with_value("#{user.first_name} #{user.last_name}")
+            full_name = "#{user.first_name} #{user.last_name}"
+            expect(item).to have_attribute('full_name').with_value(full_name)
           end
         end
       end
