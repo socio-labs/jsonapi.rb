@@ -4,13 +4,15 @@ module JSONAPI
     private
     # Default number of items per page.
     JSONAPI_PAGE_SIZE = ENV.fetch('PAGINATION_LIMIT') { 30 }
+    # Default number of items per page.
+    PAGINATION_IGNORE_KEYS = %i[total_count total_page]
 
     # Applies pagination to a set of resources
     #
     # Ex.: `GET /resource?page[number]=2&page[size]=10`
     #
     # @return [ActiveRecord::Base] a collection of resources
-    def jsonapi_paginate(resources)
+    def jsonapi_paginate(resources, options = {})
       offset, limit, _ = jsonapi_pagination_params
 
       if resources.respond_to?(:offset)
@@ -21,6 +23,13 @@ module JSONAPI
 
         # Cache the original resources size to be used for pagination meta
         resources.instance_variable_set(:@original_size, original_size)
+      end
+
+      if options[:total_count]
+        resources.instance_variable_set(
+          :@_predefined_total_count,
+          options[:total_count]
+        )
       end
 
       block_given? ? yield(resources) : resources
@@ -44,10 +53,12 @@ module JSONAPI
       original_url = '?'
 
       pagination.each do |page_name, number|
-        next if [:total_count, :total_page].include?(page_name)
+        next if PAGINATION_IGNORE_KEYS.include?(page_name)
 
         original_params[:page][:number] = number
-        links[page_name] = number.nil? ? nil : (original_url + CGI.unescape(original_params.to_query))
+        links[page_name] = number.nil? ? nil : (
+          original_url + CGI.unescape(original_params.to_query)
+        )
       end
 
       links
@@ -55,7 +66,8 @@ module JSONAPI
 
     # Generates pagination numbers
     #
-    # @return [Hash] with the first, previous, next, current, last page numbers
+    # @return [Hash] with the first, previous, next, current, last page,
+    # total_count, total_page numbers
     def jsonapi_pagination_builder(resources)
       return @_numbers if @_numbers
       return {} unless JSONAPI::Rails.is_collection?(resources)
@@ -70,7 +82,10 @@ module JSONAPI
         last: nil
       }
 
-      if resources.respond_to?(:unscope)
+      total = resources.instance_variable_get(:@_predefined_total_count)
+      if total
+        # do nothing for this condition
+      elsif resources.respond_to?(:unscope)
         total = resources.unscope(:limit, :offset, :order).size
       else
         # Try to fetch the cached size first
@@ -99,6 +114,9 @@ module JSONAPI
       @_numbers = numbers
     end
 
+    # Extracts the pagination meta
+    #
+    # @return [Hash] with the first, previous, next, current, last page numbers
     def jsonapi_pagination_meta(resources)
       pagination = jsonapi_pagination_builder(resources)
       pagination.slice(:total_count, :total_page)

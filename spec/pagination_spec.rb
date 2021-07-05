@@ -53,8 +53,9 @@ RSpec.describe UsersController, type: :request do
           expect(response_json).to have_link(:first)
           expect(response_json).to have_link(:last)
 
+          query = CGI.unescape(params.deep_merge(page: { number: 1 }).to_query)
           expect(URI.parse(response_json['links']['current']).query)
-            .to eq(CGI.unescape(params.deep_merge(page: { number: 1 }).to_query))
+            .to eq(query)
         end
 
         context 'on page 2 out of 3' do
@@ -76,8 +77,8 @@ RSpec.describe UsersController, type: :request do
               expect(response_json['data'][0]).to have_id(second_user.id.to_s)
 
               expect(response_json['meta']['pagination']).to eq(
-               'total_count'=> 3,
-               'total_page'=> 3
+                'total_count' => 3,
+                'total_page' => 3
               )
               expect(response_json['links']).to eq(
                 'current' => query_str(params),
@@ -95,8 +96,8 @@ RSpec.describe UsersController, type: :request do
             expect(response_json['data'][0]).to have_id(second_user.id.to_s)
 
             expect(response_json['meta']['pagination']).to eq(
-             'total_count'=> 3,
-             'total_page'=> 3
+              'total_count' => 3,
+              'total_page' => 3
             )
             expect(response_json['links']).to eq(
               'current' => query_str(params),
@@ -113,10 +114,12 @@ RSpec.describe UsersController, type: :request do
             expect(response_json).to have_link(:last)
 
             qry = CGI.unescape(params.to_query)
-            expect(URI.parse(response_json['links']['current']).query).to eq(qry)
+            expect(URI.parse(response_json['links']['current']).query)
+              .to eq(qry)
 
             qry = CGI.unescape(params.deep_merge(page: { number: 2 }).to_query)
-            expect(URI.parse(response_json['links']['current']).query).to eq(qry)
+            expect(URI.parse(response_json['links']['current']).query)
+              .to eq(qry)
 
             qry = CGI.unescape(params.deep_merge(page: { number: 1 }).to_query)
             expect(URI.parse(response_json['links']['prev']).query).to eq(qry)
@@ -140,8 +143,8 @@ RSpec.describe UsersController, type: :request do
             expect(response_json['data'].size).to eq(1)
 
             expect(response_json['meta']['pagination']).to eq(
-              'total_count'=> 3,
-              'total_page'=> 3
+              'total_count' => 3,
+              'total_page' => 3
             )
             expect(response_json['links']).to eq(
               'current' => query_str(params),
@@ -185,8 +188,8 @@ RSpec.describe UsersController, type: :request do
               expect(response_json['data'].size).to eq(0)
 
               expect(response_json['meta']['pagination']).to eq(
-               'total_count'=> 3,
-               'total_page'=> 3
+                'total_count' => 3,
+                'total_page' => 3
               )
               expect(response_json['links']).to eq(
                 'current' => query_str(params),
@@ -203,8 +206,8 @@ RSpec.describe UsersController, type: :request do
             expect(response_json['data'].size).to eq(0)
 
             expect(response_json['meta']['pagination']).to eq(
-             'total_count'=> 3,
-             'total_page'=> 3
+              'total_count' => 3,
+              'total_page' => 3
             )
             expect(response_json['links']).to eq(
               'current' => query_str(params),

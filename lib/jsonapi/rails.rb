@@ -153,7 +153,6 @@ module JSONAPI
           serializer_class.new(resource, options)
         )
       end
-
     end
 
     # Checks if an object is a collection
