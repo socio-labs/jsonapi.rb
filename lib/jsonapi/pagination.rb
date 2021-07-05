@@ -59,7 +59,8 @@ module JSONAPI
 
     # Generates pagination numbers
     #
-    # @return [Hash] with the first, previous, next, current, last page numbers
+    # @return [Hash] with the first, previous, next, current, last page,
+    # total_count, total_page numbers
     def jsonapi_pagination_builder(resources)
       return @_numbers if @_numbers
       return {} unless JSONAPI::Rails.is_collection?(resources)
@@ -106,6 +107,9 @@ module JSONAPI
       @_numbers = numbers
     end
 
+    # Extracts the pagination meta
+    #
+    # @return [Hash] with the first, previous, next, current, last page numbers
     def jsonapi_pagination_meta(resources)
       pagination = jsonapi_pagination_builder(resources)
       pagination.slice(:total_count, :total_page)
