@@ -86,7 +86,7 @@ RSpec.describe UsersController, type: :request do
                 'prev' => query_str(params, page: 1),
                 'next' => query_str(params, page: 3),
                 'last' => query_str(params, page: 3),
-               )
+              )
             end
           end
 
