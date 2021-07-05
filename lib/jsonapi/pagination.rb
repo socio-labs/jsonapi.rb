@@ -10,7 +10,7 @@ module JSONAPI
     # Ex.: `GET /resource?page[number]=2&page[size]=10`
     #
     # @return [ActiveRecord::Base] a collection of resources
-    def jsonapi_paginate(resources)
+    def jsonapi_paginate(resources, options = {})
       offset, limit, _ = jsonapi_pagination_params
 
       if resources.respond_to?(:offset)
@@ -21,6 +21,10 @@ module JSONAPI
 
         # Cache the original resources size to be used for pagination meta
         resources.instance_variable_set(:@original_size, original_size)
+      end
+
+      if options[:total_count]
+        resources.instance_variable_set(:@_predefined_total_count, options[:total_count])
       end
 
       block_given? ? yield(resources) : resources
@@ -70,7 +74,10 @@ module JSONAPI
         last: nil
       }
 
-      if resources.respond_to?(:unscope)
+      total = resources.instance_variable_get(:@_predefined_total_count)
+      if total
+        # do nothing for this condition
+      elsif resources.respond_to?(:unscope)
         total = resources.unscope(:limit, :offset, :order).size
       else
         # Try to fetch the cached size first
