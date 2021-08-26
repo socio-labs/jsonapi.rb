@@ -7,6 +7,8 @@ module JSONAPI
     # Ex.: `GET /resource?fields[relationship]=id,created_at`
     #
     # @return [Hash]
+    SEPARATOR = ','.freeze
+
     def jsonapi_fields
       return {} unless params[:fields].respond_to?(:each_pair)
 
@@ -17,7 +19,7 @@ module JSONAPI
       end
 
       params[:fields].each do |k, v|
-        extracted[k] = v.to_s.split(',').map(&:strip).compact
+        extracted[k] = v.to_s.split(SEPARATOR).map(&:strip).compact
       end
 
       extracted
@@ -29,7 +31,7 @@ module JSONAPI
     #
     # @return [Array]
     def jsonapi_include
-      params['include'].to_s.split(',').map(&:strip).compact
+      params['include'].to_s.split(SEPARATOR).map(&:strip).compact
     end
   end
 end

@@ -54,7 +54,7 @@ module JSONAPI
     def render_jsonapi_unprocessable_entity(exception)
       source = { pointer: '' }
 
-      if !%w{data attributes relationships}.include?(exception.param.to_s)
+      unless %w{data attributes relationships}.include?(exception.param.to_s)
         source[:pointer] = "/data/attributes/#{exception.param}"
       end
 

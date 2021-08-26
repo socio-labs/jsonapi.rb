@@ -14,6 +14,9 @@ module JSONAPI
   #
   # Initial version from the `active_model_serializers` support for JSONAPI.
   module Deserialization
+    ID_NAME = 'id'
+    OPTIONS = %w[only except polymorphic].freeze
+
     private
     # Helper method to pick an available inflector implementation
     #
@@ -32,6 +35,7 @@ module JSONAPI
     #   except: Array of symbols of blacklisted fields.
     #   polymorphic: Array of symbols of polymorphic fields.
     # @return [Hash]
+
     def jsonapi_deserialize(document, options = {})
       if document.respond_to?(:permit!)
         # Handle Rails params...
@@ -44,20 +48,22 @@ module JSONAPI
 
       # Transform keys and any option values.
       options = options.as_json
-      ['only', 'except', 'polymorphic'].each do |opt_name|
+      OPTIONS.each do |opt_name|
         opt_value = options[opt_name]
         options[opt_name] = Array(opt_value).map(&:to_s) if opt_value
       end
 
       relationships = primary_data['relationships'] || {}
       parsed = primary_data['attributes'] || {}
-      parsed['id'] = primary_data['id'] if primary_data['id']
+      parsed[ID_NAME] = primary_data[ID_NAME] if primary_data[ID_NAME]
 
       # Remove unwanted items from a dictionary.
-      if options['only']
-        [parsed, relationships].map { |hsh| hsh.slice!(*options['only']) }
-      elsif options['except']
-        [parsed, relationships].map { |hsh| hsh.except!(*options['except']) }
+      options_only = options['only']
+      options_except = options['except']
+      if options_only
+        [parsed, relationships].map { |hsh| hsh.slice!(*options_only) }
+      elsif options_except
+        [parsed, relationships].map { |hsh| hsh.except!(*options_except) }
       end
 
       relationships.map do |assoc_name, assoc_data|
@@ -65,11 +71,11 @@ module JSONAPI
         rel_name = jsonapi_inflector.singularize(assoc_name)
 
         if assoc_data.is_a?(Array)
-          parsed["#{rel_name}_ids"] = assoc_data.map { |ri| ri['id'] }.compact
+          parsed["#{rel_name}_ids"] = assoc_data.map { |ri| ri[ID_NAME] }.compact
           next
         end
 
-        parsed["#{rel_name}_id"] = assoc_data['id']
+        parsed["#{rel_name}_id"] = assoc_data[ID_NAME]
 
         if (options['polymorphic'] || []).include?(assoc_name)
           rel_type = jsonapi_inflector.classify(assoc_data['type'].to_s)
