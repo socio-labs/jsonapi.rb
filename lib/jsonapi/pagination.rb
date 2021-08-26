@@ -5,7 +5,7 @@ module JSONAPI
     # Default number of items per page.
     JSONAPI_PAGE_SIZE = ENV.fetch('PAGINATION_LIMIT') { 30 }
     # Default number of items per page.
-    PAGINATION_IGNORE_KEYS = %i[total_count total_page]
+    PAGINATION_IGNORE_KEYS = %i[total_count total_page].freeze
 
     # Applies pagination to a set of resources
     #
@@ -37,7 +37,7 @@ module JSONAPI
 
     # Generates the pagination links
     #
-    # @return [Array]
+    # @return [Hash]
     def jsonapi_pagination(resources)
       links = {}
 

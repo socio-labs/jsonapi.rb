@@ -10,14 +10,17 @@ module JSONAPI
       fields: :jsonapi_fields,
       include: :jsonapi_include,
       params: :jsonapi_serializer_params
-    }
+    }.freeze
+    JSONAPI_PAGINATE_METHODS_MAPPING_ARRAY = JSONAPI_PAGINATE_METHODS_MAPPING
+                                               .to_a.freeze
 
     JSONAPI_METHODS_MAPPING = {
       meta: :jsonapi_meta,
       fields: :jsonapi_fields,
       include: :jsonapi_include,
       params: :jsonapi_serializer_params
-    }
+    }.freeze
+    JSONAPI_METHODS_MAPPING_ARRAY = JSONAPI_METHODS_MAPPING.to_a.freeze
 
     # Updates the mime types and registers the renderers
     #
@@ -82,7 +85,7 @@ module JSONAPI
             # Rails 4 provides just the message.
             error_hash = { message: error_hash } unless error_hash.is_a?(Hash)
 
-            errors << [ error_key, error_hash ]
+            errors << [error_key, error_hash]
           end
         end
 
@@ -101,7 +104,7 @@ module JSONAPI
       ActionController::Renderers.add(:jsonapi_paginate) do |resource, options|
         self.content_type ||= Mime[:jsonapi]
 
-        JSONAPI_PAGINATE_METHODS_MAPPING.to_a[0..1].each do |opt, method_name|
+        JSONAPI_PAGINATE_METHODS_MAPPING_ARRAY[0..1].each do |opt, method_name|
           next unless respond_to?(method_name, true)
           options[opt] ||= send(method_name, resource)
         end
@@ -109,7 +112,7 @@ module JSONAPI
         # If it's an empty collection, return it directly.
         many = JSONAPI::Rails.is_collection?(resource, options[:is_collection])
 
-        JSONAPI_PAGINATE_METHODS_MAPPING.to_a[2..-1].each do |opt, method_name|
+        JSONAPI_PAGINATE_METHODS_MAPPING_ARRAY[2..-1].each do |opt, method_name|
           options[opt] ||= send(method_name) if respond_to?(method_name, true)
         end
 
@@ -129,7 +132,7 @@ module JSONAPI
       ActionController::Renderers.add(:jsonapi) do |resource, options|
         self.content_type ||= Mime[:jsonapi]
 
-        JSONAPI_METHODS_MAPPING.to_a[0..1].each do |opt, method_name|
+        JSONAPI_METHODS_MAPPING_ARRAY[0..1].each do |opt, method_name|
           next unless respond_to?(method_name, true)
           options[opt] ||= send(method_name, resource)
         end
@@ -137,7 +140,7 @@ module JSONAPI
         # If it's an empty collection, return it directly.
         many = JSONAPI::Rails.is_collection?(resource, options[:is_collection])
 
-        JSONAPI_METHODS_MAPPING.to_a[2..-1].each do |opt, method_name|
+        JSONAPI_METHODS_MAPPING_ARRAY[2..-1].each do |opt, method_name|
           options[opt] ||= send(method_name) if respond_to?(method_name, true)
         end
 

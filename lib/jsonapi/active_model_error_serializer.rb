@@ -24,7 +24,7 @@ module JSONAPI
       errors_object = params[:model].errors
 
       # Rails 4 provides just the message.
-      if error_hash[:error].present? && error_hash[:error].is_a?(Hash)
+      if error_hash[:error].is_a?(Hash) && error_hash[:error].present?
         message = errors_object.generate_message(
           error_key, nil, error_hash[:error]
         )
@@ -42,12 +42,12 @@ module JSONAPI
     attribute :source do |object, params|
       error_key, _ = object
       model_serializer = params[:model_serializer]
-      attrs = (model_serializer.attributes_to_serialize || {}).keys
-      rels = (model_serializer.relationships_to_serialize || {}).keys
+      attrs = model_serializer.attributes_to_serialize || {}
+      rels = model_serializer.relationships_to_serialize || {}
 
-      if attrs.include?(error_key)
+      if attrs.has_key?(error_key)
         { pointer: "/data/attributes/#{error_key}" }
-      elsif rels.include?(error_key)
+      elsif rels.has_key?(error_key)
         { pointer: "/data/relationships/#{error_key}" }
       else
         { pointer: '' }
