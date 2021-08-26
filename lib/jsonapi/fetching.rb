@@ -1,14 +1,14 @@
 module JSONAPI
   # Inclusion and sparse fields support
   module Fetching
+    SEPARATOR = ','.freeze
+
     private
     # Extracts and formats sparse fieldsets
     #
     # Ex.: `GET /resource?fields[relationship]=id,created_at`
     #
     # @return [Hash]
-    SEPARATOR = ','.freeze
-
     def jsonapi_fields
       return {} unless params[:fields].respond_to?(:each_pair)
 

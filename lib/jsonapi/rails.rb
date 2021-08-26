@@ -11,7 +11,8 @@ module JSONAPI
       include: :jsonapi_include,
       params: :jsonapi_serializer_params
     }.freeze
-    JSONAPI_PAGINATE_METHODS_MAPPING_ARRAY = JSONAPI_PAGINATE_METHODS_MAPPING.to_a.freeze
+    JSONAPI_PAGINATE_METHODS_MAPPING_ARRAY = JSONAPI_PAGINATE_METHODS_MAPPING
+                                               .to_a.freeze
 
     JSONAPI_METHODS_MAPPING = {
       meta: :jsonapi_meta,

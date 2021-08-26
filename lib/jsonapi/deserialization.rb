@@ -71,7 +71,7 @@ module JSONAPI
         rel_name = jsonapi_inflector.singularize(assoc_name)
 
         if assoc_data.is_a?(Array)
-          parsed["#{rel_name}_ids"] = assoc_data.map { |ri| ri[ID_NAME] }.compact
+          parsed["#{rel_name}_ids"] = assoc_data.map { |r| r[ID_NAME] }.compact
           next
         end
 
